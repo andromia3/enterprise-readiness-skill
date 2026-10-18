@@ -117,6 +117,8 @@ See `slsa-provenance.md` for detailed SLSA implementation guide.
 
 ## OpenSSF Registration
 
+Before registration, maintained public projects MUST already include an evidence-backed root `.bestpractices.json`. This is a repository standard, independent of having a registry account or an awarded badge. Scope, format limits, criterion validation and the ER-74/ER-75 assessment gates are in [`bestpractices-json.md`](bestpractices-json.md). Exclude private/archived repositories and upstream mirrors/patch-only forks with recorded evidence; independently maintained forks remain in scope.
+
 1. Register at https://www.bestpractices.dev/en/projects/new
 2. Note the Project ID assigned after registration
 3. Add badge to README with correct PROJECT_ID
@@ -199,6 +201,7 @@ Before marking enterprise-readiness complete, verify ALL:
 - [ ] README has Codecov badge (not "unknown")
 - [ ] README has OpenSSF Scorecard badge (correct URL with `api.securityscorecards.dev`)
 - [ ] README has OpenSSF Best Practices badge (correct PROJECT_ID, not placeholder)
+- [ ] Applicable maintained public projects have root `.bestpractices.json`; ER-74 format and ER-75 evidence/applicability reviews pass, with saved registry answers assessed separately
 - [ ] `.github/workflows/ci.yml` exists and uploads coverage
 - [ ] `.github/workflows/codeql.yml` exists
 - [ ] `.github/workflows/scorecard.yml` exists

@@ -42,7 +42,7 @@ enterprise-readiness-skill/
 
 Build/test/lint:
 - **Lint**: CI runs `netresearch/skill-repo-skill/.github/workflows/validate.yml`
-- **Tests**: `for t in tests/*.sh; do bash "$t" || exit 1; done; python3 tests/test_submit_badges.py` (CI: `tests.yml`; see README "Development and tests")
+- **Tests**: `for t in tests/*.sh; do bash "$t" || exit 1; done; python3 -m unittest discover -s tests -p 'test_*.py'` (CI: `tests.yml`; see README "Development and tests")
 - **Version check**: `bash Build/Scripts/check-plugin-version.sh`
 - **Badge verification**: `bash skills/enterprise-readiness/scripts/verify-badge-criteria.sh`
 - **SPDX headers**: `bash skills/enterprise-readiness/scripts/verify-spdx-headers.sh`

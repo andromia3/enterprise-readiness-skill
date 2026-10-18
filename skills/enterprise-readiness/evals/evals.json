@@ -366,5 +366,71 @@
         "pattern": "(chronological|Unreleased|heading)"
       }
     ]
+  },
+  {
+    "name": "bestpractices_repository_standard",
+    "prompt": "Assess a maintained public project which has no .bestpractices.json and has never registered for an OpenSSF badge. Complete the repository standard without copying another project's claims.",
+    "assertions": [
+      {
+        "type": "content",
+        "pattern": "\\.bestpractices\\.json"
+      },
+      {
+        "type": "content",
+        "pattern": "(required|must|MUST|missing)"
+      },
+      {
+        "type": "content",
+        "pattern": "(evidence|criterion wording|HTTPS)"
+      },
+      {
+        "type": "content",
+        "pattern": "(omit unknown|unknown.*absent|unknown.*omit)"
+      },
+      {
+        "type": "content",
+        "pattern": "(does not|neither|no automatic).*(register|save|award)"
+      },
+      {
+        "type": "must_not",
+        "pattern": "(copy all Met|all criteria.*Met|file.*automatically awards)"
+      }
+    ],
+    "samples": {
+      "passing": "A root .bestpractices.json is required even before registration. Check criterion wording and HTTPS evidence for this project; omit unknown criteria. Run ER-74 for format and ER-75 for semantic review. The file does not register a project, save answers or award a badge.",
+      "failing": [
+        "Register a badge first; the repository file is optional until registration.",
+        "A .bestpractices.json is required: copy all Met answers from another project."
+      ]
+    }
+  },
+  {
+    "name": "bestpractices_standard_applicability",
+    "prompt": "A fleet includes a private repository, an archived public project, an upstream mirror and an independently maintained public fork. Which needs the root Best Practices proposals file?",
+    "assertions": [
+      {
+        "type": "content",
+        "pattern": "(independently maintained|active maintained).*fork.*(in scope|required|must)"
+      },
+      {
+        "type": "content",
+        "pattern": "(private|archived|mirror)"
+      },
+      {
+        "type": "content",
+        "pattern": "(evidence|verify|compare)"
+      },
+      {
+        "type": "must_not",
+        "pattern": "(all forks.*excluded|every fork.*excluded)"
+      }
+    ],
+    "samples": {
+      "passing": "The independently maintained public fork is in scope and its root .bestpractices.json is required. Exclude private and archived repositories and an upstream mirror with evidence; compare the fork with upstream before deciding.",
+      "failing": [
+        "All forks are excluded, including independently maintained forks.",
+        "Every repository requires a file regardless of ownership, activity or visibility."
+      ]
+    }
   }
 ]
