@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # SPDX-License-Identifier: MIT
 # SPDX-FileCopyrightText: Netresearch DTT GmbH
 """Exercise ER-74's actual embedded Python against offline JSON fixtures."""
@@ -104,6 +103,13 @@ class BestPracticesCheckpointTests(unittest.TestCase):
         self.check(
             self.valid(repo_public_justification={"url": "https://example.org"}), 1
         )
+
+    def test_escaped_surrogates_follow_badgeapp_utf8_rules(self):
+        prefix = b'{"test_status":"Met","test_justification":"https://example.org/'
+        for surrogate in (b"\\ud800", b"\\udfff"):
+            with self.subTest(surrogate=surrogate):
+                self.check(prefix + surrogate + b'"}', 1)
+        self.check(prefix + b'\\ud83d\\ude00"}', 0)
 
     def test_format_does_not_claim_criterion_or_evidence_validation(self):
         self.check(

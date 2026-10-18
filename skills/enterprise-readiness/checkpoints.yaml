@@ -95,6 +95,7 @@ mechanical:
               match = re.fullmatch(r"([A-Za-z][A-Za-z0-9_]*)_(status|justification)", key)
               if not match or not isinstance(value, str):
                   raise ValueError("Expected criterion fields with string values: " + key)
+              value.encode("utf-8")
               criterion, kind = match.groups()
               other = "justification" if kind == "status" else "status"
               if criterion + "_" + other not in data:
