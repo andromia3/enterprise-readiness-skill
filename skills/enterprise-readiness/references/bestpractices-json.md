@@ -5,24 +5,35 @@
 
 A file the OpenSSF BadgeApp reads to pre-fill the Best Practices questionnaire. It is the only way to feed answers in without a logged-in session; [`badge-submission-api.md`](badge-submission-api.md) covers writing them directly, which needs a browser session cookie.
 
+## Required project standard
+
+Every maintained public project MUST carry `.bestpractices.json` at its repository root, including projects without a badge registration. This organization policy excludes private repositories, archived projects and upstream mirrors/patch-only forks. An independently maintained fork is in scope; compare its work with upstream before excluding it. Record the reason and evidence for an exclusion. Upstream's alternate `.project.d/bestpractices.json` path is supported by BadgeApp but does not satisfy our root-file convention.
+
+Derive a nonempty set of proposals from this project's current files, settings and executed checks. A useful minimum might be public source, licensing and contribution guidance, when those criteria are actually evidenced. Never copy another project's `Met` claims or force all criteria to have an answer. Creating or merging the file neither registers a project nor saves questionnaire answers nor awards a badge. Check saved registry answers independently.
+
+Assessment gates: **ER-74** validates an existing root file's structure; **ER-75** checks applicability, reports a missing required file, and reviews criterion names, level-specific rules and the evidence behind every claim. A mechanically green file proves format only. Do not mark an assessment complete until both applicable gates are satisfied.
+
 ## What the BadgeApp does with it
 
 Read from `.bestpractices.json` at the repository root, or from `.project.d/bestpractices.json`. The format is the project JSON itself: `<criterion>_status` and `<criterion>_justification` keys, flat in one object. Source: [`docs/bestpractices-json.md`](https://github.com/ossf/best-practices-badge/blob/main/docs/bestpractices-json.md) and the reader [`app/lib/repo_json_detective.rb`](https://github.com/ossf/best-practices-badge/blob/main/app/lib/repo_json_detective.rb).
 
-- Status values are `Met`, `Unmet`, `N/A`, case-insensitive. `?`, an empty string and any other value are ignored, so a leftover placeholder is harmless.
-- Field names are checked against the list of real criteria; an unknown key such as `_comment` is dropped silently, which makes it a safe place for a note to the reader.
+- Status values include `Met`, `Unmet`, `N/A`, case-insensitive. `?`, an empty string and unsupported values are ignored rather than proposed.
+- Field names are checked against the list of real criteria; an unknown key such as `_comment` is dropped silently. Our standard excludes ignored fields.
 - A justification is capped at 8192 characters (`Project::MAX_TEXT_LENGTH`).
+- The complete UTF-8 file is capped at 100,000 bytes. A larger file is ignored; measure bytes, including whitespace and multibyte characters.
 - Values are *proposals* at confidence 3.5. They appear in the form when a section is first edited, and again when a maintainer clicks **Save (and continue) 🤖** — the robot button is what re-runs the automation after the file has changed. Nothing is saved without a logged-in maintainer.
 
-**Unverified:** which branch the BadgeApp reads. The reader calls `repo_files.get_content(path)` without naming one; the working assumption is the default branch, so merge the file before asking anyone to save.
+The ingestion limits and format above were checked against [`RepoJsonDetective`](https://github.com/ossf/best-practices-badge/blob/f75cdbd930a205080ebe6c5d3e68316704cc90ff/app/lib/repo_json_detective.rb) and [`CriterionFieldValidator`](https://github.com/ossf/best-practices-badge/blob/f75cdbd930a205080ebe6c5d3e68316704cc90ff/app/lib/criterion_field_validator.rb). Re-check upstream when its criteria or ingestion behavior changes. Which branch the repository reader selects is not established here; merge proposals to the default branch before asking a maintainer to re-run automation.
+
+Our file standard is stricter than BadgeApp's permissive reader: require unique keys, a flat nonempty object, paired string status/justification fields and an HTTPS evidence URL in every justification; reject ignored metadata and `?`/`unknown` placeholders. Omit unknown criteria instead. Use the canonical spellings `Met`, `Unmet`, `N/A` (case-insensitive), not aliases that different consumers may interpret differently. ER-74 checks these structural rules without a network request. It cannot establish that a criterion exists, permits N/A at a target level, or is actually met.
 
 ## Write only what the repository shows
 
 The file asserts things in the project's name. A template copied across repositories is false in most of them, so derive each file from the repository it lands in:
 
-- Emit only `Met`, and only where a file or setting shows it. Never write `Unmet`: an absent key already means "unknown", and an `Unmet` proposal adds nothing the maintainer did not know.
+- Default to `Met` only when the full criterion is evidenced. Explicit `Unmet` is useful for a verified gap, and `N/A` for an evidenced inapplicability only when the criterion permits it at the target level. Explain both with evidence and rationale; omit genuinely unknown criteria.
 - Put the evidence URL in every justification (`https://github.com/<org>/<repo>/blob/<default-branch>/<path>`). Many criteria count only with a URL; see `badge-submission-api.md` § *URL-Required Justifications*.
-- Check the text of the criterion, not its name. `test` requires a suite *and* a documented way to run it; `vulnerability_report_process` requires a published *reporting* process. The wording is in [`config/locales/en.yml`](https://github.com/ossf/best-practices-badge/blob/main/config/locales/en.yml) under `criteria`.
+- Check exact field names and the text of each criterion at every target level, not just its name. Use the current official [Metal criteria](https://github.com/ossf/best-practices-badge/blob/main/criteria/criteria.yml) and [Baseline criteria](https://github.com/ossf/best-practices-badge/blob/main/criteria/baseline_criteria.yml), including `na_allowed`; names absent there are silently ignored by the reader. `test` requires a suite *and* a documented way to run it; `vulnerability_report_process` requires a published *reporting* process. Translated wording is in [`config/locales/en.yml`](https://github.com/ossf/best-practices-badge/blob/main/config/locales/en.yml) under `criteria`.
 
 Criteria that can be derived mechanically, with the rule that proved reliable:
 

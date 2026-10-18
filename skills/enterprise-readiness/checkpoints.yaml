@@ -51,6 +51,70 @@ mechanical:
     desc: "A workflow should generate SBOM (directly via cyclonedx/syft or by delegating to a security reusable workflow)"
 
   # === BADGE CHECKS ===
+  # Predicts: BadgeApp silently ignores malformed or inert repository proposals.
+  # Calibration: retire if upstream replaces repository proposal ingestion.
+  # Inlined: the runner executes inside the assessed project, not this skill.
+  # Presence/applicability and criterion semantics belong to ER-75 below.
+  - id: ER-74
+    requires: .bestpractices.json
+    type: script
+    command: |
+      python3 - <<'PY'
+      # BEGIN ER-74 Python
+      import json
+      from pathlib import Path
+      import re
+      import sys
+      from urllib.parse import urlsplit
+
+      def unique(pairs):
+          result = {}
+          for key, value in pairs:
+              if key in result:
+                  raise ValueError("Duplicate JSON key: " + key)
+              result[key] = value
+          return result
+
+      def https_evidence(text):
+          for token in re.findall(r"https://[^\s<>\"'\[\]()]+", text):
+              try:
+                  if urlsplit(token).hostname:
+                      return True
+              except ValueError:
+                  continue
+          return False
+
+      try:
+          raw = Path(".bestpractices.json").read_bytes()
+          if len(raw) > 100000:
+              raise ValueError("File exceeds BadgeApp's 100000-byte limit")
+          data = json.loads(raw.decode("utf-8"), object_pairs_hook=unique)
+          if not isinstance(data, dict) or not data:
+              raise ValueError("Expected a nonempty JSON object")
+          for key, value in data.items():
+              match = re.fullmatch(r"([A-Za-z][A-Za-z0-9_]*)_(status|justification)", key)
+              if not match or not isinstance(value, str):
+                  raise ValueError("Expected criterion fields with string values: " + key)
+              value.encode("utf-8")
+              criterion, kind = match.groups()
+              other = "justification" if kind == "status" else "status"
+              if criterion + "_" + other not in data:
+                  raise ValueError("Unpaired criterion field: " + key)
+              if kind == "status" and value.strip().lower() not in ("met", "unmet", "n/a"):
+                  raise ValueError("Use Met, Unmet or N/A; omit unknowns: " + key)
+              if kind == "justification" and (not value.strip() or len(value) > 8192 or not https_evidence(value)):
+                  raise ValueError("Justification needs HTTPS evidence and at most 8192 characters: " + key)
+      except (OSError, UnicodeError, ValueError, RecursionError) as error:
+          print(str(error), file=sys.stderr)
+          sys.exit(1)
+      # END ER-74 Python
+      PY
+    severity: error
+    desc: "When present, root .bestpractices.json must be usable UTF-8 JSON with unique paired fields, supported statuses, bounded size and HTTPS evidence; ER-75 checks applicability and meaning"
+    provenance: org-policy
+    source: https://github.com/netresearch/enterprise-readiness-skill/blob/main/skills/enterprise-readiness/references/bestpractices-json.md
+    learning_id: retro-20261018-bestpractices-standard
+
   - id: ER-04
     type: regex
     target: README.md
@@ -599,6 +663,39 @@ mechanical:
     desc: "codecov patch target should not be 100% — achievable only with full functional test coverage upload"
 
 llm_reviews:
+  # mechanical-counterpart: ER-74
+  # Predicts: missing proposals or unsupported claims survive a format-only check.
+  # Calibration: retire if the organization withdraws repository proposals.
+  - id: ER-75
+    domain: repo-health
+    severity: error
+    desc: "Maintained public projects must carry evidence-backed root .bestpractices.json; assess applicability, current criterion meaning and registry state independently"
+    provenance: org-policy
+    source: https://github.com/netresearch/enterprise-readiness-skill/blob/main/skills/enterprise-readiness/references/bestpractices-json.md
+    learning_id: retro-20261018-bestpractices-standard
+    prompt: |
+      Establish whether this is a maintained public project. Exclude private
+      repositories, archived projects, and upstream mirrors/patch-only forks;
+      an independently maintained fork remains in scope. Record the evidence
+      for an exclusion instead of inventing an applicability verdict.
+      For an in-scope project, report missing root .bestpractices.json as an
+      error even when no Best Practices project has been registered yet.
+      Upstream also reads .project.d/bestpractices.json, but the organization
+      standard requires the root path for discoverability.
+      For every included status/justification pair, check the exact criterion
+      name against current official Metal/Baseline criteria and read the
+      criterion wording for each target level. N/A must be permitted there.
+      Open the cited HTTPS evidence and check that it proves this project's
+      current state and the full claim, including reusable workflow defaults,
+      actual invocations, and relevant exceptions. Reject copied assertions,
+      ignored unknown fields, unsupported Met claims and stale measurements.
+      Explicit Unmet/N/A may be useful with evidence and rationale; leave
+      genuinely unknown criteria absent. Do not force complete questionnaires
+      or fill unknowns with Met. ER-74 validates structure, not truth.
+      Keep repository proposals distinct from saved registry answers and an
+      awarded badge: file creation/merge registers no project and saves no
+      questionnaire. Verify any claimed saved status against the registry.
+
   # === ACTION PINNING (companion to ER-10) ===
   - id: ER-10b
     domain: security

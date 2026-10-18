@@ -27,7 +27,7 @@ allowed-tools: Bash(${CLAUDE_SKILL_DIR}/scripts/*) Bash(bash ${CLAUDE_SKILL_DIR}
 
 ## Assessment Workflow
 
-1. **Discovery**: Identify platform, languages, existing CI/CD, dependabot.yml
+1. **Discovery**: Identify platform, languages, existing CI/CD, dependabot.yml; check the required root `.bestpractices.json` for maintained public projects (scope and validation: `references/bestpractices-json.md`, ER-74/ER-75).
 2. **Scoring**: Apply checklists; check Scorecard, badge criteria, coverage
 3. **Gap Analysis**: List missing controls by severity
 4. **Implementation**: Apply fixes (SHA-pin actions, harden permissions, add workflows)
@@ -36,6 +36,8 @@ allowed-tools: Bash(${CLAUDE_SKILL_DIR}/scripts/*) Bash(bash ${CLAUDE_SKILL_DIR}
 ## Mandatory Workflows & Badges
 
 Required coverage: CI, CodeQL, Scorecard, dependency review, composer audit, SBOM — as dedicated workflows or jobs calling the netresearch reusable. Badges: CI, Codecov, Scorecard, Best Practices, Baseline. See `references/badges-and-workflows.md`.
+
+Maintained public projects MUST include an evidence-backed `.bestpractices.json` at the repository root, even before badge registration. Create or refresh it from the project's own evidence; omit unknowns. The file proposes answers and does not register a project, save the questionnaire or award a badge. See `references/bestpractices-json.md`.
 
 ## Key Hardening Patterns
 

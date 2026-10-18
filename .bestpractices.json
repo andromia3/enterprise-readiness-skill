@@ -1,0 +1,10 @@
+{
+  "repo_public_status": "Met",
+  "repo_public_justification": "The maintained public source repository is available over HTTPS at https://github.com/netresearch/enterprise-readiness-skill .",
+  "repo_track_status": "Met",
+  "repo_track_justification": "The project uses Git to track changes; its public commit history is available at https://github.com/netresearch/enterprise-readiness-skill/commits/main/ .",
+  "repo_distributed_status": "Met",
+  "repo_distributed_justification": "The repository uses Git, a distributed version control system. Clone instructions and the authoritative source are available at https://github.com/netresearch/enterprise-readiness-skill .",
+  "license_location_status": "Met",
+  "license_location_justification": "The repository root contains the software license at https://github.com/netresearch/enterprise-readiness-skill/blob/main/LICENSE-MIT and the documentation/content license at https://github.com/netresearch/enterprise-readiness-skill/blob/main/LICENSE-CC-BY-SA-4.0 ."
+}
