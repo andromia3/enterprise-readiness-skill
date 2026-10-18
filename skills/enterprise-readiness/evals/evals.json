@@ -455,5 +455,58 @@
         "An independently maintained public fork is in scope and requires a root .bestpractices.json. Private repositories are excluded. Archived projects are excluded. Upstream mirrors are excluded. All forks are excluded. Record evidence for each exclusion and compare the fork with upstream."
       ]
     }
+  },
+  {
+    "name": "bestpractices_permission_gated_evidence",
+    "prompt": "Draft the MFA evidence explanation for a root .bestpractices.json. On 2026-10-18 an authenticated GET /orgs/example-org returned two_factor_requirement_enabled=true; an unauthenticated response omits that field. Explain the observation, what the missing public field establishes, and when to refresh it. The observation is supplied for this fixture; do not invent a live API call or publish credentials.",
+    "assertions": [
+      {
+        "type": "content",
+        "pattern": "GET /orgs/example-org"
+      },
+      {
+        "type": "content",
+        "pattern": "two_factor_requirement_enabled[[:space:]:=]+true"
+      },
+      {
+        "type": "content",
+        "pattern": "2026-10-18"
+      },
+      {
+        "type": "content",
+        "pattern": "(requires|needs) (privileged|authenticated|authorized) access|access is (restricted|permission.gated)|owner.restricted observation|permission.gated observation"
+      },
+      {
+        "type": "content",
+        "pattern": "(public|unauthenticated)[^.!?]*(omits|missing|does not expose|not reproducible)"
+      },
+      {
+        "type": "content",
+        "pattern": "(missing|absent|omitted)[^.!?]*field[^.!?]*(unknown|does not prove|not false)"
+      },
+      {
+        "type": "content",
+        "pattern": "(recheck|re-check|verify again)[^.!?]*(import|updat)"
+      },
+      {
+        "type": "content",
+        "pattern": "https://docs\\.github\\.com/en/rest/orgs/orgs"
+      },
+      {
+        "type": "must_not",
+        "pattern": "(^|[.!?;:][[:space:]]+)(publish|include|expose)[^.!?]*(token|credential|secret)"
+      }
+    ],
+    "samples": {
+      "passing": "For .bestpractices.json, cite the authenticated GET /orgs/example-org observation of two_factor_requirement_enabled: true on 2026-10-18. The source is https://docs.github.com/en/rest/orgs/orgs#get-an-organization. The observation requires privileged access; the public response omits the field. A missing field is unknown, not false or Unmet; omit an unknown criterion. Recheck the setting at import. Do not publish credentials.",
+      "failing": [
+        "For .bestpractices.json, cite the authenticated GET /orgs/example-org observation of two_factor_requirement_enabled: true. The source is https://docs.github.com/en/rest/orgs/orgs#get-an-organization. The observation requires privileged access; the public response omits the field. A missing field is unknown, not false or Unmet; omit an unknown criterion. Recheck the setting at import. Do not publish credentials.",
+        "For .bestpractices.json, cite the authenticated GET /orgs/example-org observation of two_factor_requirement_enabled: true on 2026-10-18. The source is https://docs.github.com/en/rest/orgs/orgs#get-an-organization. The observation is available to any caller; the public response omits the field. A missing field is unknown, not false or Unmet; omit an unknown criterion. Recheck the setting at import. Do not publish credentials.",
+        "For .bestpractices.json, cite the authenticated GET /orgs/example-org observation of two_factor_requirement_enabled: true on 2026-10-18. The source is https://docs.github.com/en/rest/orgs/orgs#get-an-organization. The observation requires privileged access; the public response exposes the field. A missing field is unknown, not false or Unmet; omit an unknown criterion. Recheck the setting at import. Do not publish credentials.",
+        "For .bestpractices.json, cite the authenticated GET /orgs/example-org observation of two_factor_requirement_enabled: true on 2026-10-18. The source is https://docs.github.com/en/rest/orgs/orgs#get-an-organization. The observation requires privileged access; the public response omits the field. A missing field proves the setting is false and the criterion is Unmet. Recheck the setting at import. Do not publish credentials.",
+        "For .bestpractices.json, cite the authenticated GET /orgs/example-org observation of two_factor_requirement_enabled: true on 2026-10-18. The source is https://docs.github.com/en/rest/orgs/orgs#get-an-organization. The observation requires privileged access; the public response omits the field. A missing field is unknown, not false or Unmet; omit an unknown criterion. The observation is a permanent guarantee. Do not publish credentials.",
+        "For .bestpractices.json, cite the authenticated GET /orgs/example-org observation of two_factor_requirement_enabled: true on 2026-10-18. The source is https://docs.github.com/en/rest/orgs/orgs#get-an-organization. The observation requires privileged access; the public response omits the field. A missing field is unknown, not false or Unmet; omit an unknown criterion. Recheck the setting at import. Publish the credentials with this explanation."
+      ]
+    }
   }
 ]
