@@ -389,18 +389,29 @@
       },
       {
         "type": "content",
-        "pattern": "(does not|neither|no automatic).*(register|save|award)"
+        "pattern": "(does not|cannot|never) register[^.!?]*project"
+      },
+      {
+        "type": "content",
+        "pattern": "(does not|cannot|never) (save[^.!?]*(answers|questionnaire)|register a project,[[:space:]]*save (answers|questionnaire answers))"
+      },
+      {
+        "type": "content",
+        "pattern": "(does not|cannot|never) (award[^.!?]*badge|register a project,[[:space:]]*save (answers|questionnaire answers) (or|and)[[:space:]]*award a badge)"
       },
       {
         "type": "must_not",
-        "pattern": "(copy all Met|all criteria.*Met|file.*automatically awards)"
+        "pattern": "(^|[.!?;:][[:space:]]+)(copy all Met|mark all criteria[^.!?]*Met|the file automatically awards)"
       }
     ],
     "samples": {
-      "passing": "A root .bestpractices.json is required even before registration. Check criterion wording and HTTPS evidence for this project; omit unknown criteria. Run ER-74 for format and ER-75 for semantic review. The file does not register a project, save answers or award a badge.",
+      "passing": "A root .bestpractices.json is required even before registration. Derive proposals from this project's current HTTPS evidence and criterion wording; omit unknown criteria. Do not copy all Met answers. The file does not register a project, save answers or award a badge.",
       "failing": [
         "Register a badge first; the repository file is optional until registration.",
-        "A .bestpractices.json is required: copy all Met answers from another project."
+        "A root .bestpractices.json is required even before registration. Derive proposals from this project's current HTTPS evidence and criterion wording; omit unknown criteria. Do not copy all Met answers. The file registers the project. The file does not save questionnaire answers. The file does not award a badge.",
+        "A root .bestpractices.json is required even before registration. Derive proposals from this project's current HTTPS evidence and criterion wording; omit unknown criteria. Do not copy all Met answers. The file does not register a project. The file saves questionnaire answers. The file does not award a badge.",
+        "A root .bestpractices.json is required even before registration. Derive proposals from this project's current HTTPS evidence and criterion wording; omit unknown criteria. Do not copy all Met answers. The file does not register a project. The file does not save questionnaire answers. The file awards a badge.",
+        "A root .bestpractices.json is required even before registration. Derive proposals from this project's current HTTPS evidence and criterion wording; omit unknown criteria. Copy all Met answers from another project. The file does not register a project. The file does not save questionnaire answers. The file does not award a badge."
       ]
     }
   },
@@ -410,11 +421,19 @@
     "assertions": [
       {
         "type": "content",
-        "pattern": "(independently maintained|active maintained).*fork.*(in scope|required|must)"
+        "pattern": "(independently maintained|active maintained)[^.!?]*fork[^.!?]*(is in scope|remains in scope|requires a root)"
       },
       {
         "type": "content",
-        "pattern": "(private|archived|mirror)"
+        "pattern": "private (repositories|projects) (are excluded|are out of scope)|(^|[.!?;:][[:space:]]+)exclude private (and archived )?(repositories|projects)"
+      },
+      {
+        "type": "content",
+        "pattern": "archived (repositories|projects) (are excluded|are out of scope)|(^|[.!?;:][[:space:]]+)exclude (private and )?archived (repositories|projects)"
+      },
+      {
+        "type": "content",
+        "pattern": "upstream mirrors (are excluded|are out of scope)|(^|[.!?;:][[:space:]]+)exclude (private and archived repositories and )?(an )?upstream mirrors?"
       },
       {
         "type": "content",
@@ -422,14 +441,18 @@
       },
       {
         "type": "must_not",
-        "pattern": "(all forks.*excluded|every fork.*excluded)"
+        "pattern": "(^|[.!?;:][[:space:]]+)(all|every)[[:space:]]forks?[^.!?]*(are|is)[[:space:]]excluded"
       }
     ],
     "samples": {
-      "passing": "The independently maintained public fork is in scope and its root .bestpractices.json is required. Exclude private and archived repositories and an upstream mirror with evidence; compare the fork with upstream before deciding.",
+      "passing": "An independently maintained public fork is in scope and its root .bestpractices.json is required. Exclude private and archived repositories and upstream mirrors with evidence; compare the fork with upstream before deciding. Not all forks are excluded.",
       "failing": [
-        "All forks are excluded, including independently maintained forks.",
-        "Every repository requires a file regardless of ownership, activity or visibility."
+        "Every repository requires a file regardless of ownership, activity or visibility.",
+        "An independently maintained public fork must be excluded and does not need a root .bestpractices.json. Private repositories are excluded. Archived projects are excluded. Upstream mirrors are excluded. Not all forks are excluded. Record evidence for each exclusion and compare the fork with upstream.",
+        "An independently maintained public fork is in scope and requires a root .bestpractices.json. Private repositories are required to carry proposals. Archived projects are excluded. Upstream mirrors are excluded. Not all forks are excluded. Record evidence for each exclusion and compare the fork with upstream.",
+        "An independently maintained public fork is in scope and requires a root .bestpractices.json. Private repositories are excluded. Archived projects are required to carry proposals. Upstream mirrors are excluded. Not all forks are excluded. Record evidence for each exclusion and compare the fork with upstream.",
+        "An independently maintained public fork is in scope and requires a root .bestpractices.json. Private repositories are excluded. Archived projects are excluded. Upstream mirrors are required to carry proposals. Not all forks are excluded. Record evidence for each exclusion and compare the fork with upstream.",
+        "An independently maintained public fork is in scope and requires a root .bestpractices.json. Private repositories are excluded. Archived projects are excluded. Upstream mirrors are excluded. All forks are excluded. Record evidence for each exclusion and compare the fork with upstream."
       ]
     }
   }
